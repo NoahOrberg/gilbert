@@ -13,16 +13,12 @@ import (
 )
 
 type Payload struct {
-	Description string `json:"description"`
-	Public      bool   `json:"public"`
-	File        File   `json:"files"`
+	Description string          `json:"description"`
+	Public      bool            `json:"public"`
+	File        map[string]File `json:"files"`
 }
 
 type File struct {
-	Content Content `json:"memo.md"`
-}
-
-type Content struct {
 	Content string `json:"content"`
 }
 
@@ -45,7 +41,9 @@ func createPayload(description, file string) (Payload, error) {
 		content += "\n"
 	}
 
-	payload.File.Content.Content = content
+	payload.File = map[string]File{
+		file: File{Content: content},
+	}
 
 	return payload, nil
 }
