@@ -42,7 +42,8 @@ func createPayload(description, file string) (Payload, error) {
 		content += "\n"
 	}
 
-	filename := strings.Split(file, "/")[len(strings.Split(file, "/"))-1]
+	tempFilename := strings.Split(file, "/")
+	filename := tempFilename[len(tempFilename)-1]
 
 	payload.File = map[string]File{
 		filename: File{Content: content},
