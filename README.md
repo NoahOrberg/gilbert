@@ -14,6 +14,5 @@ Example
 $ gilbert -f README.md
 ```
 
-README.md will be published as memo.md. (NOT implement publish origin-filename.)
-
+README.md wll be published to Gist.
 
