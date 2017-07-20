@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/NoahOrberg/gilbert/config"
 )
@@ -41,8 +42,10 @@ func createPayload(description, file string) (Payload, error) {
 		content += "\n"
 	}
 
+	filename := strings.Split(file, "/")[len(strings.Split(file, "/"))-1]
+
 	payload.File = map[string]File{
-		file: File{Content: content},
+		filename: File{Content: content},
 	}
 
 	return payload, nil
