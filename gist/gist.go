@@ -3,58 +3,75 @@ package gist
 import (
 	"bufio"
 	"bytes"
+	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 	"os"
-	"strings"
 
 	"github.com/NoahOrberg/gilbert/config"
 )
 
-func createPayload(description string, files []string) (string, error) {
-	payload := `{"description":"` + description + `", "public":false, "files":{`
-	for _, f := range files {
-		splitFName := strings.Split(f, "/")
-		fname := splitFName[len(splitFName)-1]
-		file, err := os.Open(f)
-		if err != nil {
-			log.Print("No such file or directory :" + f)
-			continue
-		}
-		defer file.Close()
-		var content string
-		scanner := bufio.NewScanner(file)
-		for scanner.Scan() {
-			content += scanner.Text()
-			content += "\\n"
-		}
+type Payload struct {
+	Description string `json:"description"`
+	Public      bool   `json:"public"`
+	File        File   `json:"files"`
+}
 
-		payload += `"` + fname + `":{"content":"` + content + `"}, `
+type File struct {
+	Content Content `json:"memo.md"`
+}
+
+type Content struct {
+	Content string `json:"content"`
+}
+
+func createPayload(description, file string) (Payload, error) {
+	payload := Payload{
+		Description: description,
+		Public:      false,
 	}
-	payload = strings.Trim(payload, ", ")
-	payload += "}}"
+
+	f, err := os.Open(file)
+	if err != nil {
+		errors.New("No such file or directory :" + file)
+	}
+	defer f.Close()
+
+	var content string
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		content += scanner.Text()
+		content += "\n"
+	}
+
+	payload.File.Content.Content = content
 
 	return payload, nil
 }
 
-func PostToGist(description string, files []string) error {
+func PostToGist(description, file string) error {
 	url := "https://api.github.com/gists"
 
 	// create payload
-	payload, err := createPayload(description, files)
+	p, err := createPayload(description, file)
 	if err != nil {
 		return err
 	}
 
-	// log
-	log.Print(payload)
-
 	config := config.GetConfig()
+
+	payload, err := json.Marshal(p)
+	if err != nil {
+		return err
+	}
+
+	log.Print(string(payload))
 
 	req, err := http.NewRequest(
 		"POST",
 		url,
-		bytes.NewBuffer([]byte(payload)),
+		bytes.NewBuffer(payload),
 	)
 	if err != nil {
 		return err
