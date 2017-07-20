@@ -4,7 +4,10 @@
 ```
 $ go get github.com/NoahOrberg/gilbert
 ```
-
+And you should set ENVIRONMENT VARIABLE
+```
+$ export GIST_TOKEN=XXXXXXXX
+```
 ## Usage
 Example
 ```
