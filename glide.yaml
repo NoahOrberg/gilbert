@@ -1,0 +1,3 @@
+package: github.com/NoahOrberg/gilbert
+import:
+- package: github.com/kelseyhightower/envconfig

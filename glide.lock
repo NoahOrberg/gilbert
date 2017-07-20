@@ -1,0 +1,6 @@
+hash: 5d2395dffd66b8a2245952d42491c6568ffe023d261332f2add1883e4d082f03
+updated: 2017-07-21T00:49:07.368743635+09:00
+imports:
+- name: github.com/kelseyhightower/envconfig
+  version: 70f0258d44cbaa3b6a2581d82f58da01a38e4de4
+testImports: []
