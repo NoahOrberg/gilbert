@@ -23,6 +23,10 @@ type File struct {
 	Content string `json:"content"`
 }
 
+type Response struct {
+	HTMLURL string `json:"html_url"`
+}
+
 func createPayload(description, file string) (Payload, error) {
 	payload := Payload{
 		Description: description,
@@ -68,8 +72,6 @@ func PostToGist(description, file string) error {
 		return err
 	}
 
-	log.Print(string(payload))
-
 	req, err := http.NewRequest(
 		"POST",
 		url,
@@ -89,6 +91,12 @@ func PostToGist(description, file string) error {
 	defer resp.Body.Close()
 
 	log.Print(resp.Status)
+
+	if resp.StatusCode == 201 {
+		var res Response
+		json.NewDecoder(resp.Body).Decode(&res)
+		log.Print(res.HTMLURL)
+	}
 
 	return nil
 }
