@@ -1,6 +1,19 @@
-hash: 5d2395dffd66b8a2245952d42491c6568ffe023d261332f2add1883e4d082f03
-updated: 2017-07-21T00:49:07.368743635+09:00
+hash: 4719305635460c7ba6d2e16fadffa6366768018c2f9a8567f764434e628193c3
+updated: 2017-07-21T11:33:12.821243623+09:00
 imports:
 - name: github.com/kelseyhightower/envconfig
   version: 70f0258d44cbaa3b6a2581d82f58da01a38e4de4
-testImports: []
+testImports:
+- name: github.com/davecgh/go-spew
+  version: 04cdfd42973bb9c8589fd6a731800cf222fde1a9
+  subpackages:
+  - spew
+- name: github.com/pmezard/go-difflib
+  version: d8ed2627bdf02c080bf22230dbb337003b7aba2d
+  subpackages:
+  - difflib
+- name: github.com/stretchr/testify
+  version: 05e8a0eda380579888eb53c394909df027f06991
+  subpackages:
+  - assert
+  - require
