@@ -1,4 +1,5 @@
 # gilbert
+[![Build Status](https://travis-ci.org/NoahOrberg/gilbert.svg?branch=master)
 
 ## Installation
 ```
