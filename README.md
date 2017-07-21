@@ -15,5 +15,5 @@ Example
 $ gilbert -f README.md
 ```
 
-README.md wll be published to Gist.
+README.md will be published to Gist.
 
