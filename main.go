@@ -13,6 +13,6 @@ func main() {
 	flag.Parse()
 	err := gist.PostToGist(*description, *file)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(err.Error())
 	}
 }

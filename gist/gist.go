@@ -35,7 +35,7 @@ func createPayload(description, file string) (Payload, error) {
 
 	f, err := os.Open(file)
 	if err != nil {
-		errors.New("No such file or directory :" + file)
+		return Payload{}, errors.New("No such file or directory :" + file)
 	}
 	defer f.Close()
 
