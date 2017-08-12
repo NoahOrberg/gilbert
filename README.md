@@ -11,9 +11,13 @@ $ export GIST_TOKEN=XXXXXXXX
 ```
 ## Usage
 Example
+- README.md will be published to Gist.
 ```
+### upload only one file.
 $ gilbert -f README.md
+### upload file and description of this.
+$ gilbert -f README.md -d "this file is README"
+### upload file and copy URL to clipboard
+$ gilbert -f README.md | pbcopy
 ```
-
-README.md will be published to Gist.
 
