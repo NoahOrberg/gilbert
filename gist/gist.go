@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -95,7 +96,7 @@ func PostToGist(description, file string) error {
 	if resp.StatusCode == 201 {
 		var res Response
 		json.NewDecoder(resp.Body).Decode(&res)
-		log.Print(res.HTMLURL)
+		fmt.Print(res.HTMLURL)
 	}
 
 	return nil
