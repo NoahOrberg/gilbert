@@ -10,8 +10,10 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"syscall"
 
 	"github.com/NoahOrberg/gilbert/config"
+	"golang.org/x/crypto/ssh/terminal"
 )
 
 type Payload struct {
@@ -26,6 +28,15 @@ type File struct {
 
 type Response struct {
 	HTMLURL string `json:"html_url"`
+}
+
+func IsNotUndefinedToken() bool {
+	config := config.GetConfig()
+	if config.Token == "" {
+		return false
+	} else {
+		return true
+	}
 }
 
 func createPayload(description, file string) (Payload, error) {
@@ -57,7 +68,7 @@ func createPayload(description, file string) (Payload, error) {
 	return payload, nil
 }
 
-func PostToGist(description, file string) error {
+func PostToGist(description, file string, isBasic bool) error {
 	url := "https://api.github.com/gists"
 
 	// create payload
@@ -82,7 +93,21 @@ func PostToGist(description, file string) error {
 		return err
 	}
 
-	req.Header.Set("Authorization", "token "+config.Token)
+	if isBasic {
+		var username string
+		fmt.Println("Please login")
+		fmt.Print("Username: ")
+		fmt.Scan(&username)
+		fmt.Print("Password: ")
+		password, err := terminal.ReadPassword(int(syscall.Stdin))
+		if err != nil {
+			return err
+		}
+		req.SetBasicAuth(username, string(password))
+		fmt.Println("")
+	} else {
+		req.Header.Set("Authorization", "token "+config.Token)
+	}
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -93,10 +118,13 @@ func PostToGist(description, file string) error {
 
 	log.Print(resp.Status)
 
-	if resp.StatusCode == 201 {
+	if resp.StatusCode == http.StatusCreated {
 		var res Response
 		json.NewDecoder(resp.Body).Decode(&res)
 		fmt.Print(res.HTMLURL)
+	}
+
+	if resp.StatusCode == http.StatusUnauthorized {
 	}
 
 	return nil

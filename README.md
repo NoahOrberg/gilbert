@@ -9,6 +9,14 @@ And you should set ENVIRONMENT VARIABLE
 ```
 $ export GIST_TOKEN=XXXXXXXX
 ```
+Or Basic Auth
+```
+$ gilbert -f README.md
+Please login
+Username: <USER NAME>
+Password: <PASSWORD>
+
+```
 ## Usage
 Example
 - README.md will be published to Gist.
@@ -17,7 +25,5 @@ Example
 $ gilbert -f README.md
 ### upload file and description of this.
 $ gilbert -f README.md -d "this file is README"
-### upload file and copy URL to clipboard
-$ gilbert -f README.md | pbcopy
 ```
 

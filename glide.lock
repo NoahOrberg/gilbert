@@ -1,8 +1,17 @@
-hash: 4719305635460c7ba6d2e16fadffa6366768018c2f9a8567f764434e628193c3
-updated: 2017-07-21T11:33:12.821243623+09:00
+hash: 9d78318910e214d6063eb3a77f9d6c5a901f8885e6beb83bde76fb5708a21b0a
+updated: 2017-08-13T23:21:30.943362597+09:00
 imports:
 - name: github.com/kelseyhightower/envconfig
   version: 70f0258d44cbaa3b6a2581d82f58da01a38e4de4
+- name: golang.org/x/crypto
+  version: b176d7def5d71bdd214203491f89843ed217f420
+  subpackages:
+  - ssh/terminal
+- name: golang.org/x/sys
+  version: e42485b6e20ae7d2304ec72e535b103ed350cc02
+  subpackages:
+  - unix
+  - windows
 testImports:
 - name: github.com/davecgh/go-spew
   version: 04cdfd42973bb9c8589fd6a731800cf222fde1a9
@@ -13,7 +22,7 @@ testImports:
   subpackages:
   - difflib
 - name: github.com/stretchr/testify
-  version: 05e8a0eda380579888eb53c394909df027f06991
+  version: 890a5c3458b43e6104ff5da8dfa139d013d77544
   subpackages:
   - assert
   - require

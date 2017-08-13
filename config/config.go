@@ -7,7 +7,7 @@ import (
 )
 
 type Config struct {
-	Token string
+	Token string `default:""`
 }
 
 func GetConfig() Config {
