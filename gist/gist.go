@@ -88,7 +88,7 @@ func createPayloadByContent(description, filename, content string) (Payload, err
 	return payload, nil
 }
 
-func PostToGistByContent(description, filename, content string, isBasic bool) (string, error) {
+func PostToGistByContent(description, filename, content string) (string, error) {
 	url := "https://api.github.com/gists"
 
 	// create payload
@@ -113,21 +113,7 @@ func PostToGistByContent(description, filename, content string, isBasic bool) (s
 		return "", err
 	}
 
-	if isBasic {
-		var username string
-		fmt.Println("Please login")
-		fmt.Print("Username: ")
-		fmt.Scan(&username)
-		fmt.Print("Password: ")
-		password, err := terminal.ReadPassword(int(syscall.Stdin))
-		if err != nil {
-			return "", err
-		}
-		req.SetBasicAuth(username, string(password))
-		fmt.Println("")
-	} else {
-		req.Header.Set("Authorization", "token "+config.Token)
-	}
+	req.Header.Set("Authorization", "token "+config.Token)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
