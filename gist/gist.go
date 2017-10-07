@@ -4,9 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -39,15 +37,10 @@ func IsNotUndefinedToken() bool {
 	}
 }
 
-func createPayload(description, file string) (Payload, error) {
-	payload := Payload{
-		Description: description,
-		Public:      false,
-	}
-
+func readFile(file string) (string, error) {
 	f, err := os.Open(file)
 	if err != nil {
-		return Payload{}, errors.New("No such file or directory :" + file)
+		return "", err
 	}
 	defer f.Close()
 
@@ -56,6 +49,20 @@ func createPayload(description, file string) (Payload, error) {
 	for scanner.Scan() {
 		content += scanner.Text()
 		content += "\n"
+	}
+
+	return content, nil
+}
+
+func createPayloadByFile(description, file string) (Payload, error) {
+	payload := Payload{
+		Description: description,
+		Public:      false,
+	}
+
+	content, err := readFile(file)
+	if err != nil {
+		return Payload{}, err
 	}
 
 	tempFilename := strings.Split(file, "/")
@@ -68,20 +75,33 @@ func createPayload(description, file string) (Payload, error) {
 	return payload, nil
 }
 
-func PostToGist(description, file string, isBasic bool) error {
+func createPayloadByContent(description, filename, content string) (Payload, error) {
+	payload := Payload{
+		Description: description,
+		Public:      false,
+	}
+
+	payload.File = map[string]File{
+		filename: File{Content: content},
+	}
+
+	return payload, nil
+}
+
+func PostToGistByContent(description, filename, content string, isBasic bool) (string, error) {
 	url := "https://api.github.com/gists"
 
 	// create payload
-	p, err := createPayload(description, file)
+	p, err := createPayloadByContent(description, filename, content)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	config := config.GetConfig()
 
 	payload, err := json.Marshal(p)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	req, err := http.NewRequest(
@@ -90,7 +110,7 @@ func PostToGist(description, file string, isBasic bool) error {
 		bytes.NewBuffer(payload),
 	)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	if isBasic {
@@ -101,7 +121,7 @@ func PostToGist(description, file string, isBasic bool) error {
 		fmt.Print("Password: ")
 		password, err := terminal.ReadPassword(int(syscall.Stdin))
 		if err != nil {
-			return err
+			return "", err
 		}
 		req.SetBasicAuth(username, string(password))
 		fmt.Println("")
@@ -112,20 +132,71 @@ func PostToGist(description, file string, isBasic bool) error {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return err
+		return "", err
 	}
 	defer resp.Body.Close()
 
-	log.Print(resp.Status)
-
+	var res Response
 	if resp.StatusCode == http.StatusCreated {
-		var res Response
 		json.NewDecoder(resp.Body).Decode(&res)
-		fmt.Print(res.HTMLURL)
 	}
 
-	if resp.StatusCode == http.StatusUnauthorized {
+	return res.HTMLURL, nil
+
+}
+
+func PostToGistByFile(description, file string, isBasic bool) (string, error) {
+	url := "https://api.github.com/gists"
+
+	// create payload
+	p, err := createPayloadByFile(description, file)
+	if err != nil {
+		return "", err
 	}
 
-	return nil
+	config := config.GetConfig()
+
+	payload, err := json.Marshal(p)
+	if err != nil {
+		return "", err
+	}
+
+	req, err := http.NewRequest(
+		"POST",
+		url,
+		bytes.NewBuffer(payload),
+	)
+	if err != nil {
+		return "", err
+	}
+
+	if isBasic {
+		var username string
+		fmt.Println("Please login")
+		fmt.Print("Username: ")
+		fmt.Scan(&username)
+		fmt.Print("Password: ")
+		password, err := terminal.ReadPassword(int(syscall.Stdin))
+		if err != nil {
+			return "", err
+		}
+		req.SetBasicAuth(username, string(password))
+		fmt.Println("")
+	} else {
+		req.Header.Set("Authorization", "token "+config.Token)
+	}
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	var res Response
+	if resp.StatusCode == http.StatusCreated {
+		json.NewDecoder(resp.Body).Decode(&res)
+	}
+
+	return res.HTMLURL, nil
 }

@@ -37,7 +37,7 @@ func TestCreatePayload(t *testing.T) {
 		},
 	}
 
-	actual, err := createPayload(description, file)
+	actual, err := createPayloadByFile(description, file)
 	require.NoError(err)
 
 	assert.Equal(expected, actual)

@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 
 	"github.com/NoahOrberg/gilbert/gist"
@@ -17,8 +18,9 @@ func main() {
 		isBasic = true
 	}
 
-	err := gist.PostToGist(*description, *file, isBasic)
+	url, err := gist.PostToGistByFile(*description, *file, isBasic)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
+	fmt.Println(url)
 }
