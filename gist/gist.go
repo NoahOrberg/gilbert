@@ -200,3 +200,63 @@ func PostToGistByFile(description, file string, isBasic bool) (string, error) {
 
 	return res.HTMLURL, nil
 }
+
+type Gist struct {
+	ID    string
+	Files map[string]File
+}
+
+func GetGist(id string) (*Gist, error) {
+	var gist *Gist
+	url := "https://api.github.com/gists"
+
+	req, err := http.NewRequest(
+		"GET",
+		url+"/"+id,
+		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	config := config.GetConfig()
+	req.Header.Set("Authorization", "token "+config.Token)
+
+	client := new(http.Client)
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if err := json.NewDecoder(resp.Body).Decode(&gist); err != nil {
+		return nil, err
+	}
+
+	return gist, nil
+}
+
+func DeleteGist(id string) error {
+	url := "https://api.github.com/gists"
+
+	req, err := http.NewRequest(
+		"DELETE",
+		url+"/"+id,
+		nil,
+	)
+	if err != nil {
+		return err
+	}
+
+	config := config.GetConfig()
+	req.Header.Set("Authorization", "token "+config.Token)
+
+	client := new(http.Client)
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	return nil
+}
