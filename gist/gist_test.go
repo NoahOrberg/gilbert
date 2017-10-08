@@ -52,7 +52,7 @@ func TestGetGist(t *testing.T) {
 	content := "AAA"
 	filename := "BBB"
 
-	url, err := PostToGistByContent("", filename, content, false)
+	url, err := PostToGistByContent("", filename, content)
 	require.NoError(err)
 
 	splittedURL := strings.Split(url, "/")
@@ -64,6 +64,42 @@ func TestGetGist(t *testing.T) {
 	c, ok := g.Files[filename]
 	assert.True(ok)
 	assert.Equal(content, c.Content)
+
+	err = DeleteGist(id)
+	require.NoError(err)
+}
+
+func TestPatchGist(t *testing.T) {
+	assert := assert.New(t)
+	require := require.New(t)
+
+	content := "AAA"
+	filename := "BBB"
+
+	url, err := PostToGistByContent("", filename, content)
+	require.NoError(err)
+
+	splittedURL := strings.Split(url, "/")
+	id := splittedURL[len(splittedURL)-1]
+
+	newContent := content + "AA"
+	ng := &Gist{
+		Files: map[string]File{
+			filename: File{
+				Content: newContent,
+			},
+		},
+	}
+
+	err = PatchGist(id, ng)
+	require.NoError(err)
+
+	g, err := GetGist(id)
+	require.NoError(err)
+
+	c, ok := g.Files[filename]
+	assert.True(ok)
+	assert.Equal(newContent, c.Content)
 
 	err = DeleteGist(id)
 	require.NoError(err)

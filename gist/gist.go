@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -11,6 +12,7 @@ import (
 	"syscall"
 
 	"github.com/NoahOrberg/gilbert/config"
+	"github.com/k0kubun/pp"
 	"golang.org/x/crypto/ssh/terminal"
 )
 
@@ -188,8 +190,7 @@ func PostToGistByFile(description, file string, isBasic bool) (string, error) {
 }
 
 type Gist struct {
-	ID    string
-	Files map[string]File
+	Files map[string]File `json:"files"`
 }
 
 func GetGist(id string) (*Gist, error) {
@@ -243,6 +244,42 @@ func DeleteGist(id string) error {
 		return err
 	}
 	defer resp.Body.Close()
+
+	return nil
+}
+
+func PatchGist(id string, gist *Gist) error {
+	url := "https://api.github.com/gists"
+
+	payload, err := json.Marshal(gist)
+	if err != nil {
+		return err
+	}
+
+	pp.Println(string(payload))
+
+	req, err := http.NewRequest(
+		"PATCH",
+		url+"/"+id,
+		bytes.NewBuffer(payload),
+	)
+	if err != nil {
+		return err
+	}
+
+	config := config.GetConfig()
+	req.Header.Set("Authorization", "token "+config.Token)
+
+	client := new(http.Client)
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return errors.New(resp.Status)
+	}
 
 	return nil
 }
