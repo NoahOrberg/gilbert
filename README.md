@@ -1,5 +1,9 @@
 # gilbert
+## Build Status
+### master branch
 [![Build Status](https://travis-ci.org/NoahOrberg/gilbert.svg?branch=master)](https://travis-ci.org/NoahOrberg/gilbert)
+### develop branch
+[![Build Status](https://travis-ci.org/NoahOrberg/gilbert.svg?branch=develop)](https://travis-ci.org/NoahOrberg/gilbert)
 
 ## Installation
 ```

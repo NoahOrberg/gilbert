@@ -3,6 +3,7 @@ package gist
 import (
 	"bufio"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -42,4 +43,28 @@ func TestCreatePayload(t *testing.T) {
 
 	assert.Equal(expected, actual)
 
+}
+
+func TestGetGist(t *testing.T) {
+	assert := assert.New(t)
+	require := require.New(t)
+
+	content := "AAA"
+	filename := "BBB"
+
+	url, err := PostToGistByContent("", filename, content, false)
+	require.NoError(err)
+
+	splittedURL := strings.Split(url, "/")
+	id := splittedURL[len(splittedURL)-1]
+
+	g, err := GetGist(id)
+	require.NoError(err)
+
+	c, ok := g.Files[filename]
+	assert.True(ok)
+	assert.Equal(content, c.Content)
+
+	err = DeleteGist(id)
+	require.NoError(err)
 }
