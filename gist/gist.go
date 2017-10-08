@@ -248,7 +248,7 @@ func DeleteGist(id string) error {
 	return nil
 }
 
-func PatchGist(id string, gist *Gist) error {
+func PatchGist(id string, gist Gist) error {
 	url := "https://api.github.com/gists"
 
 	payload, err := json.Marshal(gist)

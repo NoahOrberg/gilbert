@@ -83,7 +83,7 @@ func TestPatchGist(t *testing.T) {
 	id := splittedURL[len(splittedURL)-1]
 
 	newContent := content + "AA"
-	ng := &Gist{
+	ng := Gist{
 		Files: map[string]File{
 			filename: File{
 				Content: newContent,
