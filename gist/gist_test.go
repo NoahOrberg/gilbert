@@ -91,7 +91,7 @@ func TestPatchGist(t *testing.T) {
 		},
 	}
 
-	err = PatchGist(id, ng)
+	_, err = PatchGist(id, ng)
 	require.NoError(err)
 
 	g, err := GetGist(id)

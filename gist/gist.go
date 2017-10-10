@@ -12,7 +12,6 @@ import (
 	"syscall"
 
 	"github.com/NoahOrberg/gilbert/config"
-	"github.com/k0kubun/pp"
 	"golang.org/x/crypto/ssh/terminal"
 )
 
@@ -248,15 +247,14 @@ func DeleteGist(id string) error {
 	return nil
 }
 
-func PatchGist(id string, gist Gist) error {
+func PatchGist(id string, gist Gist) (Response, error) {
+	var res Response
 	url := "https://api.github.com/gists"
 
 	payload, err := json.Marshal(gist)
 	if err != nil {
-		return err
+		return res, err
 	}
-
-	pp.Println(string(payload))
 
 	req, err := http.NewRequest(
 		"PATCH",
@@ -264,7 +262,7 @@ func PatchGist(id string, gist Gist) error {
 		bytes.NewBuffer(payload),
 	)
 	if err != nil {
-		return err
+		return res, err
 	}
 
 	config := config.GetConfig()
@@ -273,13 +271,15 @@ func PatchGist(id string, gist Gist) error {
 	client := new(http.Client)
 	resp, err := client.Do(req)
 	if err != nil {
-		return err
+		return res, err
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return errors.New(resp.Status)
+		return res, errors.New(resp.Status)
 	}
 
-	return nil
+	json.NewDecoder(resp.Body).Decode(&res)
+
+	return res, nil
 }
