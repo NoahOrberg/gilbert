@@ -132,6 +132,49 @@ func PostToGistByContent(description, filename, content string) (string, error) 
 
 }
 
+func PostToGistByContents(g *Gist) (string, error) {
+	url := "https://api.github.com/gists"
+
+	// create payload
+	p := Payload{
+		// TODO: change Description
+		Public: false,
+		File:   g.Files,
+	}
+	payload, err := json.Marshal(p)
+	if err != nil {
+		return "", err
+	}
+
+	req, err := http.NewRequest(
+		"POST",
+		url,
+		bytes.NewBuffer(payload),
+	)
+	if err != nil {
+		return "", err
+	}
+
+	config := config.GetConfig()
+
+	req.Header.Set("Authorization", "token "+config.Token)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	var res Response
+	if resp.StatusCode == http.StatusCreated {
+		json.NewDecoder(resp.Body).Decode(&res)
+	}
+
+	return res.HTMLURL, nil
+
+}
+
 func PostToGistByFile(description, file string, isBasic bool) (string, error) {
 	url := "https://api.github.com/gists"
 

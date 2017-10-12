@@ -42,7 +42,47 @@ func TestCreatePayload(t *testing.T) {
 	require.NoError(err)
 
 	assert.Equal(expected, actual)
+}
 
+func TestPostToGistByContents(t *testing.T) {
+	assert := assert.New(t)
+	require := require.New(t)
+
+	content1 := "AAA"
+	filename1 := "BBB"
+	content2 := "CCC"
+	filename2 := "DDD"
+
+	p := &Gist{
+		Files: map[string]File{
+			filename1: File{
+				content1,
+			},
+			filename2: File{
+				content2,
+			},
+		},
+	}
+
+	url, err := PostToGistByContents(p)
+	require.NoError(err)
+
+	splittedURL := strings.Split(url, "/")
+	id := splittedURL[len(splittedURL)-1]
+
+	g, err := GetGist(id)
+	require.NoError(err)
+
+	c, ok := g.Files[filename1]
+	assert.True(ok)
+	assert.Equal(content1, c.Content)
+
+	c, ok = g.Files[filename2]
+	assert.True(ok)
+	assert.Equal(content2, c.Content)
+
+	err = DeleteGist(id)
+	require.NoError(err)
 }
 
 func TestGetGist(t *testing.T) {
