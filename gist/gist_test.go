@@ -1,8 +1,6 @@
 package gist
 
 import (
-	"bufio"
-	"os"
 	"strings"
 	"testing"
 
@@ -10,41 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestCreatePayload(t *testing.T) {
-	assert := assert.New(t)
-	require := require.New(t)
-
-	file := "../testcase/test.txt"
-	description := "DESC"
-
-	f, err := os.Open(file)
-	require.NoError(err)
-	defer f.Close()
-
-	var content string
-	scanner := bufio.NewScanner(f)
-	for scanner.Scan() {
-		content += scanner.Text()
-		content += "\n"
-	}
-
-	expected := Payload{
-		Description: "DESC",
-		Public:      false,
-		File: map[string]File{
-			"test.txt": File{
-				Content: content,
-			},
-		},
-	}
-
-	actual, err := createPayloadByFile(description, file)
-	require.NoError(err)
-
-	assert.Equal(expected, actual)
-}
-
-func TestPostToGistByContents(t *testing.T) {
+func TestPostToGist(t *testing.T) {
 	assert := assert.New(t)
 	require := require.New(t)
 
@@ -64,10 +28,10 @@ func TestPostToGistByContents(t *testing.T) {
 		},
 	}
 
-	url, err := PostToGistByContents(p)
+	res, err := PostToGist("", p)
 	require.NoError(err)
 
-	splittedURL := strings.Split(url, "/")
+	splittedURL := strings.Split(res.HTMLURL, "/")
 	id := splittedURL[len(splittedURL)-1]
 
 	g, err := GetGist(id)

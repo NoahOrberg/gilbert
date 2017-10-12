@@ -13,13 +13,6 @@ And you should set ENVIRONMENT VARIABLE
 ```
 $ export GIST_TOKEN=XXXXXXXX
 ```
-Or Basic Authentication
-```
-$ gilbert -f README.md
-Please login
-Username: <USER NAME>
-Password: <PASSWORD>
-```
 
 ## Usage
 Example
