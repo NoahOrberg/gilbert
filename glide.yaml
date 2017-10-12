@@ -1,9 +1,6 @@
 package: github.com/NoahOrberg/gilbert
 import:
 - package: github.com/kelseyhightower/envconfig
-- package: golang.org/x/crypto
-  subpackages:
-  - ssh/terminal
 testImport:
 - package: github.com/stretchr/testify
   subpackages:
