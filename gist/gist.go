@@ -85,7 +85,9 @@ func PostToGist(description string, g *Gist) (*Response, error) {
 
 	var res *Response
 	if resp.StatusCode == http.StatusCreated {
-		json.NewDecoder(resp.Body).Decode(&res)
+		if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+			return nil, err
+		}
 	}
 
 	return res, nil
@@ -147,13 +149,12 @@ func DeleteGist(id string) error {
 	return nil
 }
 
-func PatchGist(id string, gist Gist) (Response, error) {
-	var res Response
+func PatchGist(id string, gist Gist) (*Response, error) {
 	url := "https://api.github.com/gists"
 
 	payload, err := json.Marshal(gist)
 	if err != nil {
-		return res, err
+		return nil, err
 	}
 
 	req, err := http.NewRequest(
@@ -162,7 +163,7 @@ func PatchGist(id string, gist Gist) (Response, error) {
 		bytes.NewBuffer(payload),
 	)
 	if err != nil {
-		return res, err
+		return nil, err
 	}
 
 	config := config.GetConfig()
@@ -171,15 +172,18 @@ func PatchGist(id string, gist Gist) (Response, error) {
 	client := new(http.Client)
 	resp, err := client.Do(req)
 	if err != nil {
-		return res, err
+		return nil, err
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return res, errors.New(resp.Status)
+		return nil, errors.New(resp.Status)
 	}
 
-	json.NewDecoder(resp.Body).Decode(&res)
+	var res *Response
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return nil, err
+	}
 
 	return res, nil
 }
