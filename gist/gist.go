@@ -9,6 +9,8 @@ import (
 	"github.com/NoahOrberg/gilbert/config"
 )
 
+var ErrCouldNotLoad = errors.New("could not load gist")
+
 type Gist struct {
 	Files map[string]File `json:"files"`
 }
@@ -55,7 +57,8 @@ func PostToGistByContent(description, filename, content string) (string, error) 
 }
 
 func PostToGist(description string, g *Gist) (*Response, error) {
-	url := "https://api.github.com/gists"
+	conf := config.GetConfig()
+	url := conf.GistURL
 
 	p := createPayloadByContent(description, g)
 	payload, err := json.Marshal(p)
@@ -72,9 +75,7 @@ func PostToGist(description string, g *Gist) (*Response, error) {
 		return nil, err
 	}
 
-	config := config.GetConfig()
-
-	req.Header.Set("Authorization", "token "+config.Token)
+	req.Header.Set("Authorization", "token "+conf.GistToken)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -96,7 +97,8 @@ func PostToGist(description string, g *Gist) (*Response, error) {
 
 func GetGist(id string) (*Gist, error) {
 	var gist *Gist
-	url := "https://api.github.com/gists"
+	conf := config.GetConfig()
+	url := conf.GistURL
 
 	req, err := http.NewRequest(
 		"GET",
@@ -107,8 +109,7 @@ func GetGist(id string) (*Gist, error) {
 		return nil, err
 	}
 
-	config := config.GetConfig()
-	req.Header.Set("Authorization", "token "+config.Token)
+	req.Header.Set("Authorization", "token "+conf.GistToken)
 
 	client := new(http.Client)
 	resp, err := client.Do(req)
@@ -116,6 +117,10 @@ func GetGist(id string) (*Gist, error) {
 		return nil, err
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode/100 != 2 {
+		return nil, ErrCouldNotLoad
+	}
 
 	if err := json.NewDecoder(resp.Body).Decode(&gist); err != nil {
 		return nil, err
@@ -125,7 +130,8 @@ func GetGist(id string) (*Gist, error) {
 }
 
 func DeleteGist(id string) error {
-	url := "https://api.github.com/gists"
+	conf := config.GetConfig()
+	url := conf.GistURL
 
 	req, err := http.NewRequest(
 		"DELETE",
@@ -136,8 +142,7 @@ func DeleteGist(id string) error {
 		return err
 	}
 
-	config := config.GetConfig()
-	req.Header.Set("Authorization", "token "+config.Token)
+	req.Header.Set("Authorization", "token "+conf.GistToken)
 
 	client := new(http.Client)
 	resp, err := client.Do(req)
@@ -150,7 +155,8 @@ func DeleteGist(id string) error {
 }
 
 func PatchGist(id string, gist Gist) (*Response, error) {
-	url := "https://api.github.com/gists"
+	conf := config.GetConfig()
+	url := conf.GistURL
 
 	payload, err := json.Marshal(gist)
 	if err != nil {
@@ -166,8 +172,7 @@ func PatchGist(id string, gist Gist) (*Response, error) {
 		return nil, err
 	}
 
-	config := config.GetConfig()
-	req.Header.Set("Authorization", "token "+config.Token)
+	req.Header.Set("Authorization", "token "+conf.GistToken)
 
 	client := new(http.Client)
 	resp, err := client.Do(req)

@@ -7,12 +7,13 @@ import (
 )
 
 type Config struct {
-	Token string `default:""`
+	GistToken string `default:""`
+	GistURL   string `default:""`
 }
 
 func GetConfig() Config {
 	var config Config
-	err := envconfig.Process("gist", &config)
+	err := envconfig.Process("gilbert", &config)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
