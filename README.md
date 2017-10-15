@@ -11,7 +11,8 @@ $ go get github.com/NoahOrberg/gilbert
 ```
 And you should set ENVIRONMENT VARIABLE
 ```
-$ export GIST_TOKEN=XXXXXXXX
+$ export GILBERT_GISTTOKEN=XXXXXXXX
+$ export GILBERT_GISTURL=https://api.github.com/gists
 ```
 
 ## Usage
