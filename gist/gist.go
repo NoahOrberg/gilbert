@@ -131,10 +131,10 @@ func GetGist(id string) (*Gist, error) {
 	return gist, nil
 }
 
-func GetGistAndSave(id string) error {
+func GetGistAndSave(id string) (*Gist, error) {
 	gist, err := GetGist(id)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	config := config.GetConfig()
@@ -143,7 +143,7 @@ func GetGistAndSave(id string) error {
 	dir := config.Workspace + "/" + id
 	if _, err := os.Stat(dir); err != nil {
 		if err := os.MkdirAll(dir, 0755); err != nil {
-			return err
+			return nil, err
 		}
 	}
 
@@ -152,7 +152,7 @@ func GetGistAndSave(id string) error {
 	for filename, file := range gist.Files {
 		fp, err := os.Create(dir + "/" + filename)
 		if err != nil {
-			return err
+			result = multierr.Append(result, err)
 		}
 		content := []byte(file.Content)
 		if _, err := fp.Write(content); err != nil {
@@ -160,7 +160,11 @@ func GetGistAndSave(id string) error {
 		}
 	}
 
-	return result
+	if result == nil {
+		return gist, result
+	}
+
+	return nil, result
 }
 
 func DeleteGist(id string) error {

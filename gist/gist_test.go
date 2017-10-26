@@ -87,7 +87,7 @@ func TestGetGistAndSave(t *testing.T) {
 	id := splittedURL[len(splittedURL)-1]
 	defer DeleteGist(id)
 
-	err = GetGistAndSave(id)
+	_, err = GetGistAndSave(id)
 	assert.NoError(err)
 }
 
