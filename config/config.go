@@ -9,7 +9,7 @@ import (
 
 type Config struct {
 	GistToken string `default:""`
-	GistURL   string `default:""`
+	GistURL   string `default:"https://api.github.com/gists"`
 	Workspace string `default:".gilbert"`
 }
 
