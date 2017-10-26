@@ -5,8 +5,10 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"os"
 
 	"github.com/NoahOrberg/gilbert/config"
+	"go.uber.org/multierr"
 )
 
 var ErrCouldNotLoad = errors.New("could not load gist")
@@ -127,6 +129,38 @@ func GetGist(id string) (*Gist, error) {
 	}
 
 	return gist, nil
+}
+
+func GetGistAndSave(id string) error {
+	gist, err := GetGist(id)
+	if err != nil {
+		return err
+	}
+
+	config := config.GetConfig()
+
+	// 作業スペースにディレクトリがなければ作る
+	dir := config.Workspace + "/" + id
+	if _, err := os.Stat(dir); err != nil {
+		if err := os.MkdirAll(dir, 0755); err != nil {
+			return err
+		}
+	}
+
+	var result error
+
+	for filename, file := range gist.Files {
+		fp, err := os.Create(dir + "/" + filename)
+		if err != nil {
+			return err
+		}
+		content := []byte(file.Content)
+		if _, err := fp.Write(content); err != nil {
+			result = multierr.Append(result, err)
+		}
+	}
+
+	return result
 }
 
 func DeleteGist(id string) error {

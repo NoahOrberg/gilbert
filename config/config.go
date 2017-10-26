@@ -2,6 +2,7 @@ package config
 
 import (
 	"log"
+	"os"
 
 	"github.com/kelseyhightower/envconfig"
 )
@@ -9,6 +10,7 @@ import (
 type Config struct {
 	GistToken string `default:""`
 	GistURL   string `default:""`
+	Workspace string `default:".gilbert"`
 }
 
 func GetConfig() Config {
@@ -17,5 +19,6 @@ func GetConfig() Config {
 	if err != nil {
 		log.Fatal(err.Error())
 	}
+	config.Workspace = os.Getenv("HOME") + "/" + config.Workspace
 	return config
 }

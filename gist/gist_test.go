@@ -73,6 +73,24 @@ func TestGetGist(t *testing.T) {
 	require.NoError(err)
 }
 
+func TestGetGistAndSave(t *testing.T) {
+	assert := assert.New(t)
+	require := require.New(t)
+
+	content := "AAA"
+	filename := "BBB"
+
+	url, err := PostToGistByContent("", filename, content)
+	require.NoError(err)
+
+	splittedURL := strings.Split(url, "/")
+	id := splittedURL[len(splittedURL)-1]
+	defer DeleteGist(id)
+
+	err = GetGistAndSave(id)
+	assert.NoError(err)
+}
+
 func TestPatchGist(t *testing.T) {
 	assert := assert.New(t)
 	require := require.New(t)
