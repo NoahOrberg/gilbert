@@ -14,7 +14,8 @@ import (
 var ErrCouldNotLoad = errors.New("could not load gist")
 
 type Gist struct {
-	Files map[string]File `json:"files"`
+	URL   string           `json:"url"`
+	Files map[string]*File `json:"files"`
 }
 
 type File struct {
@@ -22,9 +23,9 @@ type File struct {
 }
 
 type Payload struct {
-	Description string          `json:"description"`
-	Public      bool            `json:"public"`
-	Files       map[string]File `json:"files"`
+	Description string           `json:"description"`
+	Public      bool             `json:"public"`
+	Files       map[string]*File `json:"files"`
 }
 
 type Response struct {
@@ -44,8 +45,8 @@ func createPayloadByContent(description string, g *Gist) Payload {
 
 func PostToGistByContent(description, filename, content string) (string, error) {
 	g := &Gist{
-		Files: map[string]File{
-			filename: File{
+		Files: map[string]*File{
+			filename: &File{
 				Content: content,
 			},
 		},
@@ -229,4 +230,44 @@ func PatchGist(id string, gist Gist) (*Response, error) {
 	}
 
 	return res, nil
+}
+
+func ListGists() ([]Gist, error) {
+	gists := make([]Gist, 0)
+	conf := config.GetConfig()
+	url := conf.GistURL
+
+	req, err := http.NewRequest(
+		"GET",
+		url,
+		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Set("Authorization", "token "+conf.GistToken)
+
+	client := new(http.Client)
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode/100 != 2 {
+		return nil, ErrCouldNotLoad
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&gists); err != nil {
+		return nil, err
+	}
+
+	for i, g := range gists {
+		for k, _ := range g.Files {
+			gists[i].Files[k] = nil
+		}
+	}
+
+	return gists, nil
 }

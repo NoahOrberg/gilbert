@@ -4,6 +4,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/k0kubun/pp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -18,11 +19,11 @@ func TestPostToGist(t *testing.T) {
 	filename2 := "DDD"
 
 	p := &Gist{
-		Files: map[string]File{
-			filename1: File{
+		Files: map[string]*File{
+			filename1: &File{
 				content1,
 			},
-			filename2: File{
+			filename2: &File{
 				content2,
 			},
 		},
@@ -106,8 +107,8 @@ func TestPatchGist(t *testing.T) {
 
 	newContent := content + "AA"
 	ng := Gist{
-		Files: map[string]File{
-			filename: File{
+		Files: map[string]*File{
+			filename: &File{
 				Content: newContent,
 			},
 		},
@@ -125,4 +126,12 @@ func TestPatchGist(t *testing.T) {
 
 	err = DeleteGist(id)
 	require.NoError(err)
+}
+
+func TestListGists(t *testing.T) {
+	gs, err := ListGists()
+
+	require.NoError(t, err)
+	pp.Println(gs)
+	assert.NotNil(t, gs)
 }
